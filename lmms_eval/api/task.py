@@ -735,8 +735,14 @@ class ConfigurableTask(Task):
                 self._filters.append(filter_pipeline)
         else:
             self._filters = [build_filter_ensemble("none", [["take_first", None]])]
+        # 始终初始化 sampler，无论是否有 fewshot_config
         if self.config.fewshot_config is not None:
-            self.sampler = samplers.get_sampler(self.config.fewshot_config.get("sampler", "default") if self.config.fewshot_config else "default")(list(self.fewshot_docs()), self, rnd=random.Random(1234))
+            sampler_name = self.config.fewshot_config.get("sampler", "default")
+        else:
+            sampler_name = "default"
+        
+        # 创建 sampler 实例
+        self.sampler = samplers.get_sampler(sampler_name)(list(self.fewshot_docs()), self, rnd=random.Random(1234))
 
         if self.has_test_docs():
             self.task_docs = self.test_docs()

@@ -163,11 +163,11 @@ class MathVistaEvaluator:
     if API_TYPE == "openai":
         API_URL = os.getenv("OPENAI_API_URL", "https://api.openai.com/v1/chat/completions")
         API_KEY = os.getenv("OPENAI_API_KEY", "YOUR_API_KEY")
-        headers = {
-            "Authorization": f"Bearer {API_KEY}",
-            "Content-Type": "application/json",
-        }
-        client = OpenAI(api_key=API_KEY)
+        clean = re.sub(r"/chat/completions$", "", API_URL)
+        client = OpenAI(
+            base_url= clean,
+            api_key= API_KEY,
+        )
         gpt_model = config["metadata"]["gpt_eval_model_name"]
 
     elif API_TYPE == "azure":

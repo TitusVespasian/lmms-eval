@@ -20,7 +20,7 @@ import re
 
 import immutabledict
 import nltk
-
+nltk.data.path.append('/data2/xuzhiyu/nltk_data')
 
 def download_nltk_resources():
     """Download 'punkt' if not already installed"""

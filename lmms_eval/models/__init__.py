@@ -53,6 +53,7 @@ AVAILABLE_MODELS = {
     "qwen2_vl": "Qwen2_VL",
     "qwen_vl": "Qwen_VL",
     "qwen_vl_api": "Qwen_VL_API",
+    "qwen2": "Qwen2",
     "reka": "Reka",
     "ross": "Ross",
     "slime": "Slime",

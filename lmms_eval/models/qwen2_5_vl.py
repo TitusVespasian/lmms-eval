@@ -232,20 +232,22 @@ class Qwen2_5_VL(lmms):
                     contexts[i] = context
 
                 processed_visuals = []
-                for visual in visual_list[i]:
-                    if isinstance(visual, str) and visual.endswith((".mp4", ".avi", ".mov")):  # Video file
-                        vr = decord.VideoReader(visual)
-                        first_frame = vr[0].asnumpy()
-                        height, width = first_frame.shape[:2]
-                        # max_pixels = height * width
-                        processed_visuals.append({"type": "video", "video": visual, "max_pixels": self.max_pixels, "min_pixels": self.min_pixels})
-                    elif isinstance(visual, Image.Image):  # Handle both single and multiple images
-                        base64_image = visual.convert("RGB")
-                        buffer = BytesIO()
-                        base64_image.save(buffer, format="JPEG")
-                        base64_bytes = base64.b64encode(buffer.getvalue())
-                        base64_string = base64_bytes.decode("utf-8")
-                        processed_visuals.append({"type": "image", "image": f"data:image/jpeg;base64,{base64_string}", "max_pixels": self.max_pixels, "min_pixels": self.min_pixels})
+                # Handle the case where visual_list[i] is None (no images)
+                if visual_list[i] is not None:
+                    for visual in visual_list[i]:
+                        if isinstance(visual, str) and visual.endswith((".mp4", ".avi", ".mov")):  # Video file
+                            vr = decord.VideoReader(visual)
+                            first_frame = vr[0].asnumpy()
+                            height, width = first_frame.shape[:2]
+                            # max_pixels = height * width
+                            processed_visuals.append({"type": "video", "video": visual, "max_pixels": self.max_pixels, "min_pixels": self.min_pixels})
+                        elif isinstance(visual, Image.Image):  # Handle both single and multiple images
+                            base64_image = visual.convert("RGB")
+                            buffer = BytesIO()
+                            base64_image.save(buffer, format="JPEG")
+                            base64_bytes = base64.b64encode(buffer.getvalue())
+                            base64_string = base64_bytes.decode("utf-8")
+                            processed_visuals.append({"type": "image", "image": f"data:image/jpeg;base64,{base64_string}", "max_pixels": self.max_pixels, "min_pixels": self.min_pixels})
 
                 if self.interleave_visuals is False:
                     message.append(

@@ -1,4 +1,4 @@
-dataset_path: WildVision/wildvision-arena-data
+dataset_path: /data2/xuzhiyu/datasets/wildvision-arena-data
 dataset_kwargs:
   token: True
 output_type: generate_until

@@ -66,7 +66,7 @@ class Qwen2_VL(lmms):
         if use_flash_attention_2:
             self._model = Qwen2VLForConditionalGeneration.from_pretrained(
                 pretrained,
-                torch_dtype="auto",
+                torch_dtype=torch.bfloat16, # default is auto
                 device_map=self.device_map,
                 attn_implementation="flash_attention_2",
             ).eval()

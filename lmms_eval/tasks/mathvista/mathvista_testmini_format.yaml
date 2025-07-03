@@ -1,4 +1,4 @@
-dataset_path: AI4Math/MathVista
+dataset_path: /data2/xuzhiyu/datasets/MathVista
 dataset_kwargs:
   token: True
 task: "mathvista_testmini_format"
