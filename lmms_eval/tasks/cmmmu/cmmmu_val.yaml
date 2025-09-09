@@ -4,8 +4,10 @@ test_split: val
 process_results: !function utils.cmmmu_process_results
 # Note that the metric name can be either a registed metric function (such as the case for GQA) or a key name returned by process_results
 generation_kwargs:
-  max_new_tokens: 16
+  max_new_tokens: 512
   image_aspect_ratio: original
+  no_repeat_ngram_size: 4       # 强烈建议加
+  # repetition_penalty: 1.15      # 轻度惩罚即可
 metric_list:
   - metric: cmmmu_acc
     aggregation: !function utils.cmmmu_aggregate_results

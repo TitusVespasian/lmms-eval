@@ -368,7 +368,9 @@ class LlavaHf(lmms):
                     use_cache=self.use_cache,
                     pad_token_id=self.eot_token_id,
                     eos_token_id=self.eot_token_id,
-                )
+                    no_repeat_ngram_size=gen_kwargs.get("no_repeat_ngram_size", 0),
+                    repetition_penalty=gen_kwargs.get("repetition_penalty", 1.0)
+                ) # pyright: ignore[reportCallIssue]
                 cont = cont[:, inputs["input_ids"].shape[-1] :]
             except Exception as e:
                 eval_logger.error(f"Error {e} in generating")

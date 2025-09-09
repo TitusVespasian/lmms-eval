@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import inspect
 import json
+import math
 import os
 import pathlib
 import re
@@ -686,12 +687,39 @@ def apply_template(template: str, doc: dict) -> str:
     return rtemplate.render(**doc)
 
 
-def create_iterator(raw_iterator, rank, world_size, limit=None):
+def create_iterator(raw_iterator, rank, world_size, limit=None, data_range=None):
     """
     Method for creating a (potentially) sliced and limited
     iterator from a raw document iterator. Used for splitting data
-    among ranks in multigpu setting or only pulling a sample of documents
+    among ranks in multigpu setting or only pulling a sample of documents.
+    
+    Args:
+        raw_iterator: The source iterator
+        rank: Current process rank for distributed processing
+        world_size: Total number of processes
+        limit: Maximum number of items to return
+        data_range: Range string in format "[start,end]" for percentile-based slicing
     """
+    if data_range is not None:
+        # Parse range and apply data slicing
+        try:
+            from .evaluator_utils import parse_range
+            range_tuple = parse_range(data_range)
+            if range_tuple is not None:
+                start_pct, end_pct = range_tuple
+                # Convert iterator to list to calculate indices
+                raw_list = list(raw_iterator)
+                total_len = len(raw_list)
+                start_idx = int(total_len * start_pct)
+                end_idx = int(math.ceil(total_len * end_pct))
+                start_idx = max(0, start_idx)
+                end_idx = min(total_len, end_idx)
+                # Create new iterator from the range slice
+                raw_iterator = iter(raw_list[start_idx:end_idx])
+        except ImportError:
+            # Fallback if parse_range is not available
+            pass
+    
     return islice(raw_iterator, rank, limit, world_size)
 
 

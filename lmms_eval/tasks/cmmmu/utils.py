@@ -193,7 +193,7 @@ def eval_cmmmu(entries):
                 elif negative_count > positive_count:
                     return "错"
                 else:
-                    return random.choice(["对", "错"])
+                    return "未知" # orginal random choice
 
             answer = entry["answer"]
             parsed_pred = [word for word in parsed_pred if not any(ambiguous in word for ambiguous in ambiguous_keywords)]

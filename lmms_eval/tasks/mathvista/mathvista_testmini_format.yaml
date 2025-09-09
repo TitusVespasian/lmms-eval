@@ -1,6 +1,7 @@
-dataset_path: /data2/xuzhiyu/datasets/MathVista
+dataset_path: /mnt/hdd/xuzhiyu/datasets/MathVista
 dataset_kwargs:
   token: True
+  load_from_disk: true
 task: "mathvista_testmini_format"
 test_split: testmini
 output_type: generate_until
