@@ -1,4 +1,4 @@
-dataset_path: /data2/xuzhiyu/datasets/MathVision
+dataset_path: /data2/xuzhiyu/datasets/Mathvision
 dataset_kwargs:
   token: True
 task: "mathvision_reason_testmini"
