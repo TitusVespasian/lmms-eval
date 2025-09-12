@@ -6,7 +6,7 @@ process_results: !function utils.cmmmu_process_results
 generation_kwargs:
   max_new_tokens: 512
   image_aspect_ratio: original
-  no_repeat_ngram_size: 4       # 强烈建议加
+  # no_repeat_ngram_size: 4       # 强烈建议加
   # repetition_penalty: 1.15      # 轻度惩罚即可
 metric_list:
   - metric: cmmmu_acc
