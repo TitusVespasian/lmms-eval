@@ -1,15 +1,15 @@
-dataset_path: /mnt/hdd/xuzhiyu/datasets/MathVista
+dataset_path: /data2/xuzhiyu/datasets/MathVista_split
 dataset_kwargs:
   token: True
   load_from_disk: true
 task: "mathvista_testmini_format"
-test_split: testmini
+test_split: dev
 output_type: generate_until
 doc_to_visual: !function utils.mathvista_doc_to_visual
 doc_to_text: !function utils.mathvista_doc_to_text
 doc_to_target: "answer"
 generation_kwargs:
-  max_new_tokens: 1024
+  max_new_tokens: 64
   temperature: 0
   top_p: 1.0
   num_beams: 1

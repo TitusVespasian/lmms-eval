@@ -1,4 +1,4 @@
-dataset_path: MathLLMs/MathVision
+dataset_path: /data2/xuzhiyu/datasets/MathVision
 dataset_kwargs:
   token: True
 task: "mathvision_test"
