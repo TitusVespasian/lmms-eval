@@ -1,5 +1,4 @@
-group: jmmmu
-group_alias: jmmmu_all
+group: jmmmu_dev
 task:
   - group: culture_agnostic
     task:

@@ -1,4 +1,4 @@
-dataset_path: /data2/xuzhiyu/datasets/jmmmu_split
+dataset_path: TitusVespasian/JMMMU_split
 test_split: dev
 output_type: generate_until
 doc_to_visual: !function utils.jmmmu_doc_to_visual

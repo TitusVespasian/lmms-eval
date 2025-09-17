@@ -1,6 +1,7 @@
-dataset_path: /data2/xuzhiyu/datasets/Mathvision
+dataset_path: /mnt/hdd/xuzhiyu/datasets/MathVision
 dataset_kwargs:
   token: True
+  load_from_disk: true
 task: "mathvision_reason_testmini"
 test_split: testmini
 tag: visual_reasoning_collection
