@@ -2,7 +2,6 @@ dataset_path: /mnt/hdd/xuzhiyu/datasets/MathVerse_split
 dataset_name: text_lite
 dataset_kwargs:
   token: False
-  load_from_disk: true
 
 task: "mathverse_testmini_text_lite_dev"
 test_split: dev

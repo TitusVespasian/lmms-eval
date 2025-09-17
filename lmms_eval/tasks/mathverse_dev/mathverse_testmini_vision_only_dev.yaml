@@ -2,7 +2,7 @@ dataset_path: /mnt/hdd/xuzhiyu/datasets/MathVerse_split
 dataset_name: vision_only
 dataset_kwargs:
   token: False
-  load_from_disk: true
+
 task: "mathverse_testmini_vision_only_dev"
 test_split: dev
 output_type: generate_until

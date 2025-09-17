@@ -1,4 +1,4 @@
-group: mathverse
+group: mathverse_dev
 task:
   # - mathverse_testmini_text_only_dev
   - mathverse_testmini_text_lite_dev
