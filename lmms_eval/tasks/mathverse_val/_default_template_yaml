@@ -1,0 +1,9 @@
+generation_kwargs:
+  until:
+    - "ASSISTANT:"
+  max_new_tokens: 1024
+  temperature: 0.2
+  top_p: 0.9  
+  num_beams: 1
+  do_sample: true
+  repetition_penalty: 1.1

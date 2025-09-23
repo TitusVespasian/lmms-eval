@@ -9,14 +9,7 @@ output_type: generate_until
 doc_to_visual: !function utils.mathverse_doc_to_visual
 doc_to_text: !function utils.mathverse_doc_to_text
 doc_to_target: "answer"
-generation_kwargs:
-  until:
-    - "ASSISTANT:"
-  max_new_tokens: 1024
-  temperature: 0
-  top_p: 0
-  num_beams: 1
-  do_sample: false
+
 process_results: !function utils.mathverse_process_results
 metric_list:
   - metric: gpt_eval_score
@@ -33,3 +26,5 @@ lmms_eval_specific_kwargs:
 model_specific_generation_kwargs:
   llava:
     image_aspect_ratio: original
+
+include: _default_template_yaml

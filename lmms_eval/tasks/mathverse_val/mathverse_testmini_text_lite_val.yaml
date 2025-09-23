@@ -1,15 +1,14 @@
 dataset_path: /mnt/hdd/xuzhiyu/datasets/MathVerse_split
-dataset_name: vision_dominant
+dataset_name: text_lite
 dataset_kwargs:
   token: False
 
-task: "mathverse_testmini_vision_dominant_dev"
-test_split: dev
+task: "mathverse_testmini_text_lite_val"
+test_split: val
 output_type: generate_until
 doc_to_visual: !function utils.mathverse_doc_to_visual
 doc_to_text: !function utils.mathverse_doc_to_text
 doc_to_target: "answer"
-
 process_results: !function utils.mathverse_process_results
 metric_list:
   - metric: gpt_eval_score
@@ -18,7 +17,7 @@ metric_list:
   - metric: submission
     aggregation: !function utils.mathverse_aggregate_results_submission
     higher_is_better: true
-  
+
 lmms_eval_specific_kwargs:
   default:
     shot_type: "format-prompt" # can also be "custom-prompt"

@@ -1,4 +1,5 @@
-task: TitusVespasian/WildVision_split
+dataset_path: TitusVespasian/WildVision_split
+task: wildvision_0617_val
 # dataset_name: release_bench_0617_with_modelresponse
 test_split: val
 output_type: generate_until

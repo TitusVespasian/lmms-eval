@@ -1,0 +1,23 @@
+dataset_path: TitusVespasian/JMMMU_split
+test_split: val
+output_type: generate_until
+doc_to_visual: !function utils.jmmmu_doc_to_visual
+doc_to_text: !function utils.jmmmu_doc_to_text
+doc_to_target: "answer"
+
+process_results: !function utils.jmmmu_process_results
+
+metric_list:
+  - metric: jmmmu_acc
+    aggregation: !function utils.jmmmu_aggregate_results
+    higher_is_better: true
+
+generation_kwargs:
+  max_new_tokens: 512
+  image_aspect_ratio: original
+  no_repeat_ngram_size: 4       # 强烈建议加
+  repetition_penalty: 1.15      # 轻度惩罚即可
+
+metadata:
+  version: 0.0
+  interleaved_format: false

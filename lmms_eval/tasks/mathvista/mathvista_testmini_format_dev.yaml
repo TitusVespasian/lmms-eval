@@ -2,7 +2,7 @@ dataset_path: /mnt/hdd/xuzhiyu/datasets/MathVista_split
 dataset_kwargs:
   token: True
   load_from_disk: true
-task: "mathvista_testmini_format"
+task: "mathvista_testmini_format_dev"
 test_split: dev
 output_type: generate_until
 doc_to_visual: !function utils.mathvista_doc_to_visual
