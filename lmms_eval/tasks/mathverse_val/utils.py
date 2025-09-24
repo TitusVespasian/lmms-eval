@@ -9,7 +9,7 @@ from loguru import logger as eval_logger
 from lmms_eval.tasks._task_utils.file_utils import generate_submission_file
 from lmms_eval.tasks.mathverse.mathverse_evals import MathVerseEvaluator
 
-with open(Path(__file__).parent / "mathverse_dev.yaml", "r") as f:
+with open(Path(__file__).parent / "mathverse_val.yaml", "r") as f:
     raw_data = f.readlines()
     safe_data = []
     for i, line in enumerate(raw_data):
