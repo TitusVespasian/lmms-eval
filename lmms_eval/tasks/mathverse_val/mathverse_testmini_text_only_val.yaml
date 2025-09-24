@@ -1,4 +1,3 @@
-dataset_path: /mnt/hdd/xuzhiyu/datasets/MathVerse_split
 dataset_name: text_only
 dataset_kwargs:
   token: False

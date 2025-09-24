@@ -1,3 +1,4 @@
+dataset_path: TitusVespasian/MathVerse_split
 generation_kwargs:
   until:
     - "ASSISTANT:"
