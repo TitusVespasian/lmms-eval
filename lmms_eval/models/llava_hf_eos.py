@@ -47,8 +47,8 @@ except Exception as e:
     eval_logger.debug("Transformers version does not support llava-onevision. Skipping.")
 
 
-@register_model("llava_hf")
-class LlavaHf(lmms):
+@register_model("llava_hf_eos")
+class LlavaHfEOS(lmms):
     """
     Llava Model for Hugging Face Transformers: https://huggingface.co/docs/transformers/v4.39.3/en/model_doc/llava
 

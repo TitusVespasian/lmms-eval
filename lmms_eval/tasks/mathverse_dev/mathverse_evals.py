@@ -190,11 +190,16 @@ class MathVerseEvaluator:
 
         try:
             full_prompt = self.create_match_prompt(DEMO_PROMPT_SCORE, question, answer, extraction)
-            while True:
-                extraction = self.get_chat_response(full_prompt, temperature=0, max_tokens=8, n=1)
+            patience = 3
+            while patience > 0:
+                extraction = self.get_chat_response(full_prompt, temperature=0, max_tokens=8, n=1, patience=100)
                 judgement = extraction.replace("Judgement:", "").strip()
                 if judgement.strip() in ["0", "1"]:
                     return int(judgement) == 1
+                else:
+                    print(f"patience {patience}, GPT resp not matched to 1/0, {judgement}")
+                    patience = patience - 1
+            return False
 
         except Exception as e:
             print(e)
