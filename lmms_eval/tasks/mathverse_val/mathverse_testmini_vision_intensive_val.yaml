@@ -3,7 +3,6 @@ dataset_kwargs:
   token: False
 
 task: "mathverse_testmini_vision_intensive_val"
-test_split: val
 output_type: generate_until
 doc_to_visual: !function utils.mathverse_doc_to_visual
 doc_to_text: !function utils.mathverse_doc_to_text
