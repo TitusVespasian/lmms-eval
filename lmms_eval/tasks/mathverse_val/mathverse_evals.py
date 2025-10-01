@@ -104,7 +104,7 @@ class MathVerseEvaluator:
         response.raise_for_status()
         return response.json()
 
-    def get_chat_response(self, prompt, temperature=0, max_tokens=256, n=1, patience=10000000, sleep_time=0):
+    def get_chat_response(self, prompt, temperature=0, max_tokens=256, n=1, patience=5, sleep_time=2):
         messages = [
             {"role": "user", "content": prompt},
         ]
@@ -148,6 +148,7 @@ class MathVerseEvaluator:
                         {"role": "user", "content": prompt},
                     ]
 
+                print(f"Unrecognized Errorr: {str(e)}")
                 if sleep_time > 0:
                     time.sleep(sleep_time)
         return ""
@@ -192,7 +193,7 @@ class MathVerseEvaluator:
             full_prompt = self.create_match_prompt(DEMO_PROMPT_SCORE, question, answer, extraction)
             patience = 3
             while patience > 0:
-                extraction = self.get_chat_response(full_prompt, temperature=0, max_tokens=8, n=1, patience=100)
+                extraction = self.get_chat_response(full_prompt, temperature=0, max_tokens=8, n=1, patience=3)
                 judgement = extraction.replace("Judgement:", "").strip()
                 if judgement.strip() in ["0", "1"]:
                     return int(judgement) == 1
@@ -281,7 +282,7 @@ class MathVerseEvaluator:
 
     def eval_results(self, results, config):
         # extract and score for each question
-        for inst in tqdm(results):
+        for inst in tqdm(results, desc="extract&score"):
             full_prediction = inst["prediction"].strip()
             problem = {
                 "question_type": inst["question_type"],
