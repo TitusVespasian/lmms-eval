@@ -154,7 +154,7 @@ def process_rawscore(component_type, raw_score):
     first_sentence = raw_score.split(""".""")[0].split(""",""")
     score_dict = {}
     for i in range(len(first_sentence) - 1):
-        score_ = first_sentence[i].split(""":""")[1][1:].split("""/""")
+        score_ = first_sentence[i].split(""":""")[-1][1:].split("""/""")
         score = int(score_[0]) / int(score_[1])
         score_dict[component_type[i]] = score
 
