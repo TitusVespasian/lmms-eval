@@ -1,4 +1,4 @@
-    import base64
+import base64
 import re
 from io import BytesIO
 from typing import List, Optional, Tuple, Union
@@ -24,25 +24,24 @@ try:
 except ImportError:
     eval_logger.warning("Failed to import qwen_vl_utils; Please install it via `pip install qwen-vl-utils`")
 
-def flatten(raw_messages):
-    flat = []
-    for m in raw_messages:
-        if isinstance(m.get("content"), list):          # user 混合 image + text
-            role = m["role"]
-            for item in m["content"]:
-                item = item.copy()
-                item["role"] = role                    # 补上 role
-                flat.append(item)
-        else:                                          # system / assistant 纯文本
-            flat.append({
-                "role": m["role"],
-                "type": "text",
-                "text": m["content"]
-            })
-    return flat
+from lmms_eval.models.model_utils.norepeat_processor import EOSNGramLogitsProcessor
+from transformers.generation.logits_process import LogitsProcessorList, NoRepeatNGramLogitsProcessor
 
-@register_model("qwen2_vl_woinst")
-class Qwen2_VL_woinst(lmms):
+def flatten(batched_messages):
+    new_bacthed_messages = []
+    for message in batched_messages:
+        new_message = []
+        for msg_dict in message:
+            if msg_dict['role'] == "system":
+                continue
+            if msg_dict['role'] == "user":
+                new_message += msg_dict['content']
+        new_bacthed_messages.append(new_message)
+    return new_bacthed_messages
+
+
+@register_model("qwen2_vl_eos_woinst")
+class Qwen2_VL_EOS_woinst(lmms):
     """
     Qwen2_VL Model
     "https://github.com/QwenLM/Qwen2-VL"
@@ -127,6 +126,19 @@ class Qwen2_VL_woinst(lmms):
         else:
             self._rank = 0
             self._world_size = 1
+
+        default_processors = self.model._get_logits_processor(
+            generation_config= self.model.generation_config # type: ignore
+        ) # type: ignore
+
+        kept = LogitsProcessorList([p for p in default_processors if not isinstance(p, NoRepeatNGramLogitsProcessor)])
+
+        eos_id = getattr(self.model.generation_config, "eos_token_id", None) or self.processor.tokenizer.eos_token_id
+        if isinstance(eos_id, (list, tuple)):
+            eos_id = int(eos_id[0])
+        kept.append(EOSNGramLogitsProcessor(ngram_size=20, eos_token_id=eos_id))
+
+        self.logits_processors = kept
 
     @property
     def config(self):
@@ -336,9 +348,8 @@ class Qwen2_VL_woinst(lmms):
 
                 batched_messages.append(message)
 
-            messages = [flatten(batched_msg) for batched_msg in batched_messages]
-                
-            texts = [self.processor.apply_chat_template(msg, tokenize=False, add_generation_prompt=True) for msg in messages]
+            new_batched_messages = flatten(batched_messages)
+            texts = [self.processor.apply_chat_template(msg, tokenize=False, add_generation_prompt=True) for msg in new_batched_messages]
             # TODO: Consider moving video frame sampling logic into process_vision_info or a helper.
             image_inputs, video_inputs = process_vision_info(batched_messages)
             if video_inputs is not None and len(video_inputs) > 0 and video_inputs[0] is not None:
@@ -393,7 +404,8 @@ class Qwen2_VL_woinst(lmms):
                 num_beams=current_gen_kwargs["num_beams"],
                 max_new_tokens=current_gen_kwargs["max_new_tokens"],
                 use_cache=self.use_cache,
-            )
+                logits_processor=self.logits_processors
+            ) # pyright: ignore[reportCallIssue]
 
             # Decode generated sequences, excluding input tokens
             generated_ids_trimmed = []

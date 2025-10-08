@@ -53,6 +53,7 @@ AVAILABLE_MODELS = {
     "qwen2_audio": "Qwen2_Audio",
     "qwen2_vl": "Qwen2_VL",
     "qwen2_vl_eos": "Qwen2_VL_EOS",
+    "qwen2_vl_eos_woinst": "Qwen2_VL_EOS_woinst",
     "qwen2_vl_woinst": "Qwen2_VL_woinst",
     "qwen_vl": "Qwen_VL",
     "qwen_vl_api": "Qwen_VL_API",
