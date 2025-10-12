@@ -113,21 +113,6 @@ class Idefics2_EOS(lmms):
             self._rank = 0
             self._world_size = 1
 
-       # 1) 用干净拷贝拿默认 processors（不会污染原 config）
-        gc_src = self.model.generation_config
-        gc_clean = GenerationConfig.from_dict(gc_src.to_dict())  # 纯可序列化数据，无 Tensor
-        # 如果某些分支要求先准备 special tokens，再拿 processors，就在 *clean* 上准备：
-        _ = self.model._prepare_special_tokens(generation_config=gc_clean)
-        default_processors = self.model._get_logits_processor(generation_config=gc_clean)
-
-        kept = LogitsProcessorList([p for p in default_processors if not isinstance(p, NoRepeatNGramLogitsProcessor)])
-
-        eos_id = getattr(self.model.generation_config, "eos_token_id", None) or self._processor.tokenizer.eos_token_id
-        if isinstance(eos_id, (list, tuple)):
-            eos_id = int(eos_id[0])
-        kept.append(EOSNGramLogitsProcessor(ngram_size=20, eos_token_id=eos_id))
-
-        self.logits_processors = kept
 
     @property
     def config(self):
@@ -250,7 +235,13 @@ class Idefics2_EOS(lmms):
             else:
                 inputs = self._processor(text=prompts, images=visuals, padding=True, return_tensors="pt")
             inputs = {k: v.to(self.device) for k, v in inputs.items()}
-            output_ids = self.model.generate(**inputs, **gen_kwargs, logits_processor=self.logits_processors)
+            # get eos id
+            eos_id = getattr(self.model.generation_config, "eos_token_id", None) or self._processor.tokenizer.eos_token_id
+            # see if needed
+            if isinstance(eos_id, (list, tuple)):
+                eos_id = int(eos_id[0])
+            
+            output_ids = self.model.generate(**inputs, **gen_kwargs, logits_processor=LogitsProcessorList([EOSNGramLogitsProcessor(ngram_size=20, eos_token_id=eos_id)])) # pyright: ignore[reportCallIssue]
             # only retain the generated text
             for output_id, input_id in zip(output_ids, inputs["input_ids"]):
                 generated_id = output_id[len(input_id) :]
