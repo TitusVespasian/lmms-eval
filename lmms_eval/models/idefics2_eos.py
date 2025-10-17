@@ -235,6 +235,7 @@ class Idefics2_EOS(lmms):
             else:
                 inputs = self._processor(text=prompts, images=visuals, padding=True, return_tensors="pt")
             inputs = {k: v.to(self.device) for k, v in inputs.items()}
+            
             # get eos id
             eos_id = getattr(self.model.generation_config, "eos_token_id", None) or self._processor.tokenizer.eos_token_id
             # see if needed
