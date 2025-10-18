@@ -127,19 +127,6 @@ class Qwen2_VL_EOS_woinst(lmms):
             self._rank = 0
             self._world_size = 1
 
-        default_processors = self.model._get_logits_processor(
-            generation_config= self.model.generation_config # type: ignore
-        ) # type: ignore
-
-        kept = LogitsProcessorList([p for p in default_processors if not isinstance(p, NoRepeatNGramLogitsProcessor)])
-
-        eos_id = getattr(self.model.generation_config, "eos_token_id", None) or self.processor.tokenizer.eos_token_id
-        if isinstance(eos_id, (list, tuple)):
-            eos_id = int(eos_id[0])
-        kept.append(EOSNGramLogitsProcessor(ngram_size=20, eos_token_id=eos_id))
-
-        self.logits_processors = kept
-
     @property
     def config(self):
         # return the associated transformers.AutoConfig for the given pretrained model.
@@ -393,6 +380,13 @@ class Qwen2_VL_EOS_woinst(lmms):
             current_gen_kwargs = {**default_gen_kwargs, **gen_kwargs}  # Provided gen_kwargs override defaults
 
             pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else self.tokenizer.eos_token_id
+            # get eos id
+            eos_id = getattr(self.model.generation_config, "eos_token_id", None)
+            if eos_id is None or eos_id == []:
+                eos_id = self.processor.tokenizer.eos_token_id
+            if isinstance(eos_id, (list, tuple)):
+                eos_id = int(eos_id[0])
+            assert isinstance(eos_id, int) and eos_id < self.model.get_input_embeddings().num_embeddings, f"eos_id {eos_id} out of range" # type: ignore
 
             cont = self.model.generate(
                 **inputs,
@@ -404,7 +398,7 @@ class Qwen2_VL_EOS_woinst(lmms):
                 num_beams=current_gen_kwargs["num_beams"],
                 max_new_tokens=current_gen_kwargs["max_new_tokens"],
                 use_cache=self.use_cache,
-                logits_processor=self.logits_processors
+                logits_processor=LogitsProcessorList([EOSNGramLogitsProcessor(ngram_size=20, eos_token_id=eos_id)])
             ) # pyright: ignore[reportCallIssue]
 
             # Decode generated sequences, excluding input tokens

@@ -114,10 +114,6 @@ class Qwen2_VL_EOS(lmms):
             self._rank = 0
             self._world_size = 1
 
-        default_processors = self.model._get_logits_processor(
-            generation_config= self.model.generation_config # type: ignore
-        ) # type: ignore
-
     @property
     def config(self):
         # return the associated transformers.AutoConfig for the given pretrained model.
@@ -371,10 +367,12 @@ class Qwen2_VL_EOS(lmms):
 
             pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else self.tokenizer.eos_token_id
             # get eos id
-            eos_id = getattr(self.model.generation_config, "eos_token_id", None) or self.processor.tokenizer.eos_token_id
-            # see if needed
+            eos_id = getattr(self.model.generation_config, "eos_token_id", None)
+            if eos_id is None or eos_id == []:
+                eos_id = self.processor.tokenizer.eos_token_id
             if isinstance(eos_id, (list, tuple)):
                 eos_id = int(eos_id[0])
+            assert isinstance(eos_id, int) and eos_id < self.model.get_input_embeddings().num_embeddings, f"eos_id {eos_id} out of range" # type: ignore
 
             cont = self.model.generate(
                 **inputs,

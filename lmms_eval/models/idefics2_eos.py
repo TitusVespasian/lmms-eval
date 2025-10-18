@@ -237,10 +237,12 @@ class Idefics2_EOS(lmms):
             inputs = {k: v.to(self.device) for k, v in inputs.items()}
             
             # get eos id
-            eos_id = getattr(self.model.generation_config, "eos_token_id", None) or self._processor.tokenizer.eos_token_id
-            # see if needed
+            eos_id = getattr(self.model.generation_config, "eos_token_id", None)
+            if eos_id is None or eos_id == []:
+                eos_id = self._processor.tokenizer.eos_token_id
             if isinstance(eos_id, (list, tuple)):
                 eos_id = int(eos_id[0])
+            assert isinstance(eos_id, int) and eos_id < self.model.get_input_embeddings().num_embeddings, f"eos_id {eos_id} out of range"
             
             output_ids = self.model.generate(**inputs, **gen_kwargs, logits_processor=LogitsProcessorList([EOSNGramLogitsProcessor(ngram_size=20, eos_token_id=eos_id)])) # pyright: ignore[reportCallIssue]
             # only retain the generated text
