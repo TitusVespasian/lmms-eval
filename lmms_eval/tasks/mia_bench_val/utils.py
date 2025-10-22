@@ -48,6 +48,9 @@ GPT_EVAL_MODEL_NAME = config["metadata"]["gpt_eval_model_name"]
 NUM_SECONDS_TO_SLEEP = 10
 API_TYPE = os.getenv("API_TYPE", "openai")
 
+if GPT_EVAL_MODEL_NAME == "deepseek-chat":
+    API_URL = os.getenv("DEEPSEEK_API_URL")
+    assert API_URL is not None, "Unspecified API URL for deepseek!!!"
 if API_TYPE == "openai":
     API_URL = os.getenv("OPENAI_API_URL", "https://api.openai.com/v1/chat/completions")
     API_KEY = os.getenv("OPENAI_API_KEY", "YOUR_API_KEY")
