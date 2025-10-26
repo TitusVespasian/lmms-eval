@@ -154,7 +154,7 @@ def wild_vision_process_results(doc, results):
     user_prompt = prompt_template.format(question_1=doc["instruction"], answer_1=doc[BASELINE_MODEL_NAME], answer_2=pred)
     base64_image = image_to_base64(doc["image"])
     resps, gpt_name = get_chat_response(base64_image, user_prompt)
-    score, _ = get_score(resps, pattern=re.compile("\[\[([AB<>=]+)\]\]"))
+    score, _ = get_score(resps, pattern=re.compile(r"\[\[([AB<>=]+)\]\]"))
 
     if score is None:
         score = resps

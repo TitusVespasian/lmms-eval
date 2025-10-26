@@ -9,6 +9,8 @@ import numpy as np
 import requests
 import yaml
 from loguru import logger as eval_logger
+import re
+from typing import List, Dict, Any, Optional
 
 from lmms_eval.tasks._task_utils.file_utils import generate_submission_file
 
@@ -46,6 +48,9 @@ GPT_EVAL_MODEL_NAME = config["metadata"]["gpt_eval_model_name"]
 NUM_SECONDS_TO_SLEEP = 10
 API_TYPE = os.getenv("API_TYPE", "openai")
 
+if GPT_EVAL_MODEL_NAME == "deepseek-chat":
+    API_URL = os.getenv("DEEPSEEK_API_URL")
+    assert API_URL is not None, "Unspecified API URL for deepseek!!!"
 if API_TYPE == "openai":
     API_URL = os.getenv("OPENAI_API_URL", "https://api.openai.com/v1/chat/completions")
     API_KEY = os.getenv("OPENAI_API_KEY", "YOUR_API_KEY")
@@ -151,22 +156,60 @@ def generate_prompt(d, response):
 
 
 def process_rawscore(component_type, raw_score):
-    first_sentence = raw_score.split(""".""")[0].split(""",""")
-    score_dict = {}
-    for i in range(len(first_sentence) - 1):
-        score_ = first_sentence[i].split(""":""")[-1][1:].split("""/""")
-        score = int(score_[0]) / int(score_[1])
-        score_dict[component_type[i]] = score
+    """
+    返回 score_dict：{component_type[i]: 得分(小数), "total_score": 小数}
+    逻辑：逐句找第一个满足——句中出现的 "score of component" 次数 == len(component_type)
+         且包含 "total score"（大小写不敏感；以这两个锚点简洁匹配）
+    """
+    comp_re  = re.compile(r"score\s*of\s*component\s*\d*\s*:\s*(\d+)\s*/\s*(\d+)", re.I)
+    total_re = re.compile(r"total\s*score\s*:\s*(\d+)\s*/\s*(\d+)", re.I)
+    sents = re.split(r"(?<=[\.\!\?;。！？；])\s+", re.sub(r"\s+", " ", raw_score.strip()))
+    need = len(component_type)
 
-    # Ensure that the loop has executed at least once
-    if len(first_sentence) > 1:
-        total_score_ = first_sentence[-1].split(""":""")[1][1:].split("""/""")
-        total_score = int(total_score_[0]) / int(total_score_[1])
-        score_dict["total_score"] = total_score
-    else:
-        score_dict["total_score"] = 0  # or handle this case as needed
+    for s in sents:
+        comps = comp_re.findall(s)
+        total = total_re.search(s)
+        if len(comps) == need and total:
+            d = {}
+            for i, (got, tot) in enumerate(comps):
+                got, tot = int(got), int(tot)
+                if tot == 0:
+                    print(f"Unexpected format of GPT response! \nThe GPT resp is{raw_score}. \nAssigning \"{component_type[i]}\"score of 0!")
+                d[component_type[i]] = (got / tot) if tot!=0 else 0.0
+            tg, tt = map(int, total.groups())
+            if tot == 0:
+                print(f"Unexpected format of GPT response! \nThe GPT resp is{raw_score}. \nAssigning \"total_score\"score of 0!")
+            d["total_score"] = (tg / tt) if tt else 0.0
+            return d
+    print(f"Unexpected format of GPT response! \nThe GPT resp is{raw_score}. \nAssigning \"all\"score of 0!")
+    return {k: 0.0 for k in component_type} | {"total_score": 0.0}
 
-    return score_dict
+
+# def process_rawscore(component_type, raw_score):
+#     first_sentence = re.search(r"score of component", raw_score, flags=re.I)
+#     first_sentence = raw_score.split(""".""")[0].split(""",""")
+#     score_dict = {}
+#     for i in range(len(first_sentence) - 1):
+#         try:
+#             score_ = first_sentence[i].split(""":""")[-1][1:].split("""/""")
+#             score = int(score_[0]) / int(score_[1])
+#         except:
+#             print(f"Unexpected format of GPT response! \nThe GPT resp is{raw_score}. \nAssigning score of 0!")
+#             score = 0
+#         score_dict[component_type[i]] = score
+
+#     # Ensure that the loop has executed at least once
+#     if len(first_sentence) > 1:
+#         total_score_ = first_sentence[-1].split(""":""")[1][1:].split("""/""")
+#         total_score = int(total_score_[0]) / int(total_score_[1])
+#         score_dict["total_score"] = total_score
+#     else:
+#         score_dict["total_score"] = 0  # or handle this case as needed
+
+#     res = pick_score_sentence(raw_score, component_type)
+
+
+#     return score_dict
 
 
 def mia_bench_process_results(doc, results):
@@ -175,7 +218,7 @@ def mia_bench_process_results(doc, results):
     eval_prompt = generate_prompt(doc, response)
     eval_score, _ = get_eval(eval_prompt, 1024)
     score_dict = process_rawscore(components, eval_score)
-    return {"gpt_eval_score": score_dict}
+    return {"gpt_eval_score": score_dict, "raw_score": eval_score}
 
 
 # ============================
