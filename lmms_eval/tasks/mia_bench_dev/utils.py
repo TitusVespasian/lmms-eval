@@ -151,7 +151,7 @@ def generate_prompt(d, response):
         + response
         + """' You need to score the response and be strict. The total score ranges from 0 to 10, depending on if the response follows the instruction. """
         + score
-        + " List scores of each component, and the total score in one sentence in this format: score of component 1: x/2, score of component 2: y/8, total score: z/10. Then explain your reasons."
+        + "List scores of each component, and the total score in one sentence in **exactly** this format: score of component 1: (your score)/(max score), score of component 2: (your score)/(max score),..., total score: (sum of your scores)/(sum of max scores). Then explain your reasons."
     )
 
 
