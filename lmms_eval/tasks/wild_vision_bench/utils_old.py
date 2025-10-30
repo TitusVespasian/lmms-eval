@@ -66,32 +66,7 @@ After providing your explanation, you must output only one of the following choi
 4. Assistant B is slightly better: [[B>A]]
 5. Assistant B is significantly better: [[B>>A]]
 
-STRICT OUTPUT FORMAT (MANDATORY):
-You MUST output using the following three tagged sections ONLY, in this exact order:
-
-<|My_Answer|>
-[Write your best possible answer to the user prompt here. Keep it concise and self-contained.]
-<|End_My_Answer|>
-
-<|Evaluation|>
-- Accuracy vs. My_Answer: 
-- Assistant A issues (errors/omissions/misinterpretations) and corrections:
-- Assistant B issues (errors/omissions/misinterpretations) and corrections:
-- Helpfulness/clarity/conciseness comparison:
-- Creativity/novelty (if applicable):
-- Missing but useful information:
-<|End_Evaluation|>
-
-<|Final_Verdict|>
-[Choose EXACTLY ONE of: [[A>>B]] [[A>B]] [[A=B]] [[B>A]] [[B>>A]]]
-<|End_Final_Verdict|>
-
-HARD CONSTRAINTS:
-- Use EXACTLY these tags and order.
-- Do NOT output anything outside the three tagged sections.
-- In <|Final_Verdict|> include ONLY one of the five allowed tokens, nothing else.
-- Be concise (Evaluation ≤ 1500 characters).
-- No markdown headings, emojis, or code fences in the final output.\
+Example output: "My final verdict is tie: [[A=B]]".\
 """
 
 prompt_template = "<|User Prompt|>\n{question_1}\n\n<|The Start of Assistant A's Answer|>\n{answer_1}\n<|The End of Assistant A's Answer|>\n\n<|The Start of Assistant B's Answer|>\n{answer_2}\n<|The End of Assistant B's Answer|>"
