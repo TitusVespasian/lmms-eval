@@ -1,7 +1,5 @@
 task: "cmmmu_dev"
-dataset_path: /data/workspace/datasets/CMMMU_split
-dataset_kwargs:
-  load_from_disk: true
+dataset_path: TitusVespasian/CMMMU_split
 test_split: dev
 # The return value of process_results will be used by metrics
 process_results: !function utils.cmmmu_process_results
