@@ -230,5 +230,5 @@ def mia_bench_aggregate_results(results):
     total_score = 0
     for result in results:
         # Overall accuracy
-        total_score += result["gpt_eval_score"]["total_score"]
+        total_score += result["total_score"]
     return total_score / len(results)
