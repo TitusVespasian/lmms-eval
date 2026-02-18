@@ -57,6 +57,7 @@ AVAILABLE_MODELS = {
     "qwen2_vl_eos": "Qwen2_VL_EOS",
     "qwen2_vl_eos_woinst": "Qwen2_VL_EOS_woinst",
     "qwen2_vl_woinst": "Qwen2_VL_woinst",
+    "vllm_eos_woinst": "VLLM_EOS_WoInst",
     "qwen_vl": "Qwen_VL",
     "qwen_vl_api": "Qwen_VL_API",
     "qwen2": "Qwen2",
@@ -80,8 +81,8 @@ AVAILABLE_MODELS = {
     "whisper": "Whisper",
     "whisper_vllm": "WhisperVllm",
     "vora": "VoRA",
+    "vllm_woinst": "VLLM_WOINST",
 }
-
 
 def get_model(model_name):
     if model_name not in AVAILABLE_MODELS:
@@ -106,3 +107,4 @@ if os.environ.get("LMMS_EVAL_PLUGINS", None):
         m = importlib.import_module(f"{plugin}.models")
         for model_name, model_class in getattr(m, "AVAILABLE_MODELS").items():
             AVAILABLE_MODELS[model_name] = f"{plugin}.models.{model_name}.{model_class}"
+
