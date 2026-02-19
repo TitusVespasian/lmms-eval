@@ -181,7 +181,7 @@ def process_rawscore(component_type, raw_score):
                 print(f"Unexpected format of GPT response! \nThe GPT resp is{raw_score}. \nAssigning \"total_score\"score of 0!")
             d["total_score"] = (tg / tt) if tt else 0.0
             return d
-    print(f"Unexpected format of GPT response! \nThe GPT resp is{raw_score}. \nAssigning \"all\"score of 0!")
+    print(f"Unexpected format of GPT response! \nThe GPT resp is {raw_score}. \nAssigning \"all\"score of 0!")
     return {k: 0.0 for k in component_type} | {"total_score": 0.0}
 
 
@@ -229,6 +229,13 @@ def mia_bench_process_results(doc, results):
 def mia_bench_aggregate_results(results):
     total_score = 0
     for result in results:
-        # Overall accuracy
-        total_score += result["gpt_eval_score"]["total_score"]
+        # Check if result is the score_dict directly (lmms-eval behavior)
+        if "total_score" in result:
+            total_score += result["total_score"]
+        # Check if result is the wrapper dict (miabench_batch_v2 behavior)
+        elif "gpt_eval_score" in result and "total_score" in result["gpt_eval_score"]:
+            total_score += result["gpt_eval_score"]["total_score"]
+        else:
+            raise ValueError("Unexpected format for total score")
+            
     return total_score / len(results)

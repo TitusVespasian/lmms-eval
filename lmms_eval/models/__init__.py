@@ -81,7 +81,8 @@ AVAILABLE_MODELS = {
     "whisper": "Whisper",
     "whisper_vllm": "WhisperVllm",
     "vora": "VoRA",
-    "vllm_woinst": "VLLM_WOINST",
+    "vllm_eos_woinst": "VLLM_EOS_WoInst",
+    "vllm_woinst": "VLLMWoInst"
 }
 
 def get_model(model_name):
